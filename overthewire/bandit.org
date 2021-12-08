@@ -1,0 +1,40 @@
+* Bandit
+This is a writeup for the overthewire.org war game. The password for each 
+level is stored in a file named banditX.txt where X is the level number. Then 
+use
+
+#+BEGIN_SRC bash
+
+sshpass -p `cat banditX.txt` ssh banditX.labs.overthewire.org -p 2220
+
+#+END_SRC
+
+to log in.
+
+** Level 0
+The password for this level is given: bandit0. Simply connect to the server with SSH to port 2220. 
+The password for the next level is stored in a file called readme.
+
+#+BEGIN_SRC bash
+
+bandit0@bandit:~$ ls
+readme
+bandit0@bandit:~$ cat readme
+boJ9jbbUNNfktd78OOpsqOltutMc3MY1
+
+#+END_SRC
+
+** Level 1
+The password to the next level is located in a file named '-', to cat out the
+contents of this file use the full path to the file from the home directory.
+
+#+BEGIN_SRC bash
+
+bandit1@bandit:~$ ls
+-
+bandit1@bandit:~$ cat ~/-
+CV1DtqXWVFXTvM2F0k09SHz0YwRINYA9
+
+#+END_SRC 
+
+** Level 2
