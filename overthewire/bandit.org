@@ -1,11 +1,12 @@
 * Bandit
+** Introduction
 This is a writeup for the overthewire.org war game. The password for each 
 level is stored in a file named banditX.txt where X is the level number. Then 
 use
 
 #+BEGIN_SRC bash
 
-sshpass -p `cat banditX.txt` ssh banditX.labs.overthewire.org -p 2220
+sshpass -p `cat banditX.txt` ssh banditX@bandit.labs.overthewire.org -p 2220
 
 #+END_SRC
 
@@ -38,3 +39,162 @@ CV1DtqXWVFXTvM2F0k09SHz0YwRINYA9
 #+END_SRC 
 
 ** Level 2
+The password is in a file with spaces in the name. To cat out the contents either 
+use backslashes before the spaces or surround the entire file name with single 
+or double quotes.
+
+ #+BEGIN_SRC 
+ 
+bandit2@bandit:~$ ls -al
+total 24
+drwxr-xr-x  2 root    root    4096 May  7  2020 .
+drwxr-xr-x 41 root    root    4096 May  7  2020 ..
+-rw-r--r--  1 root    root     220 May 15  2017 .bash_logout
+-rw-r--r--  1 root    root    3526 May 15  2017 .bashrc
+-rw-r--r--  1 root    root     675 May 15  2017 .profile
+-rw-r-----  1 bandit3 bandit2   33 May  7  2020 spaces in this filename
+bandit2@bandit:~$ cat spaces\ in\ this\ filename
+UmHadQclWmgdLOKQ3YNgjWxGoRMb5luK
+
+ #+END_SRC
+ 
+** Level 3
+The password is in a hidden file inside the directory 'inhere'. To cat out the 
+contents move into the inhere directory and cat out the file.
+
+#+BEGIN_SRC 
+
+bandit3@bandit:~$ ls -al
+total 24
+drwxr-xr-x  3 root root 4096 May  7  2020 .
+drwxr-xr-x 41 root root 4096 May  7  2020 ..
+-rw-r--r--  1 root root  220 May 15  2017 .bash_logout
+-rw-r--r--  1 root root 3526 May 15  2017 .bashrc
+drwxr-xr-x  2 root root 4096 May  7  2020 inhere
+-rw-r--r--  1 root root  675 May 15  2017 .profile
+bandit3@bandit:~$ cd inhere/
+bandit3@bandit:~/inhere$ ls -al
+total 12
+drwxr-xr-x 2 root    root    4096 May  7  2020 .
+drwxr-xr-x 3 root    root    4096 May  7  2020 ..
+-rw-r----- 1 bandit4 bandit3   33 May  7  2020 .hidden
+bandit3@bandit:~/inhere$ cat .hidden
+pIwrPrtPN36QITSp3EQaw936yaFoFgAB
+
+#+END_SRC
+
+** Level 4
+The password is the only human readable file inside the directory 'inhere'. When
+listing all the files in the directory notice that the file names start with a
+'-', which means that to use the files as input to a command it requires the full
+path from the home directory to be able to execute the command.
+To find the file that contains human readable content use the command 'file' and
+the regular expression * to execute the command on all files inside the 
+directory.
+
+#+BEGIN_SRC 
+
+bandit4@bandit:~$ ls -al
+total 24
+drwxr-xr-x  3 root root 4096 May  7  2020 .
+drwxr-xr-x 41 root root 4096 May  7  2020 ..
+-rw-r--r--  1 root root  220 May 15  2017 .bash_logout
+-rw-r--r--  1 root root 3526 May 15  2017 .bashrc
+drwxr-xr-x  2 root root 4096 May  7  2020 inhere
+-rw-r--r--  1 root root  675 May 15  2017 .profile
+bandit4@bandit:~$ ls -al inhere/
+total 48
+drwxr-xr-x 2 root    root    4096 May  7  2020 .
+drwxr-xr-x 3 root    root    4096 May  7  2020 ..
+-rw-r----- 1 bandit5 bandit4   33 May  7  2020 -file00
+-rw-r----- 1 bandit5 bandit4   33 May  7  2020 -file01
+-rw-r----- 1 bandit5 bandit4   33 May  7  2020 -file02
+-rw-r----- 1 bandit5 bandit4   33 May  7  2020 -file03
+-rw-r----- 1 bandit5 bandit4   33 May  7  2020 -file04
+-rw-r----- 1 bandit5 bandit4   33 May  7  2020 -file05
+-rw-r----- 1 bandit5 bandit4   33 May  7  2020 -file06
+-rw-r----- 1 bandit5 bandit4   33 May  7  2020 -file07
+-rw-r----- 1 bandit5 bandit4   33 May  7  2020 -file08
+-rw-r----- 1 bandit5 bandit4   33 May  7  2020 -file09
+bandit4@bandit:~$ file inhere/-file0*
+inhere/-file00: data
+inhere/-file01: data
+inhere/-file02: data
+inhere/-file03: data
+inhere/-file04: data
+inhere/-file05: data
+inhere/-file06: data
+inhere/-file07: ASCII text
+inhere/-file08: data
+inhere/-file09: data
+bandit4@bandit:~$ cat inhere/-file07
+koReBOKuIDDepwhWk7jZC0RTdopnAYKh
+
+#+END_SRC
+
+** Level 5
+The directory 'inhere' contains several directories which contains files. One 
+of these files contains the password, this file has the following properties:
+size = 1033 bytes, is human-readable and is not executable. 
+The find command can be used to find this file. The size flag can be used to 
+find files of a specific size and the perm flag in conjunction with the \! 
+operator can be used to find files that are not executable. To find the files 
+that contain human readable text the exec flag can be used to execute the file 
+command just like in level 4. Lastly pipe the result of find into grep with the 
+text ASCII to find all files that satisfy the required conditions.
+
+#+BEGIN_SRC 
+
+bandit5@bandit:~$ ls -Al
+total 16
+-rw-r--r--  1 root root     220 May 15  2017 .bash_logout
+-rw-r--r--  1 root root    3526 May 15  2017 .bashrc
+drwxr-x--- 22 root bandit5 4096 May  7  2020 inhere
+-rw-r--r--  1 root root     675 May 15  2017 .profile
+bandit5@bandit:~$ ls -Al inhere/
+total 80
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere00
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere01
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere02
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere03
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere04
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere05
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere06
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere07
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere08
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere09
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere10
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere11
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere12
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere13
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere14
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere15
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere16
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere17
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere18
+drwxr-x--- 2 root bandit5 4096 May  7  2020 maybehere19
+bandit5@bandit:~$ find ~/inhere/ -size 1033c \! -perm /a+x -exec file {} + | grep ASCII
+/home/bandit5/inhere/maybehere07/.file2: ASCII text, with very long lines
+bandit5@bandit:~$ cat ~/inhere/maybehere07/.file2
+DXjZPULLxYr17uwoI01bNLQbtFemEgo7
+
+#+END_SRC
+
+** Level 6
+The file containing the password is somewhere on the server with the following
+properties: size = 33 bytes, owned by user bandit7 and owned by group bandit6.
+To find the file use the find command with flags size, user and group and look
+for the line that does not have a 'permissions denied' at the end.
+
+#+BEGIN_SRC 
+
+bandit6@bandit:~$ find / -type f -user bandit7 -group bandit6 -size 33c
+find: ‘/root’: Permission denied
+...
+find: ‘/var/lib/polkit-1’: Permission denied
+/var/lib/dpkg/info/bandit7.password
+find: ‘/var/log’: Permission denied
+...
+bandit6@bandit:~$ cat /var/lib/dpkg/info/bandit7.password
+HKBPTKQnIay4Fw76bEy8PVxKEDQRKTzs
+#+END_SRC
