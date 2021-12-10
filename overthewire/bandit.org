@@ -183,18 +183,231 @@ DXjZPULLxYr17uwoI01bNLQbtFemEgo7
 ** Level 6
 The file containing the password is somewhere on the server with the following
 properties: size = 33 bytes, owned by user bandit7 and owned by group bandit6.
-To find the file use the find command with flags size, user and group and look
-for the line that does not have a 'permissions denied' at the end.
+To clean up the 'permission denied' in output from this command redirect the
+stderr to /dev/null with '2> /dev/null'.
 
 #+BEGIN_SRC 
 
-bandit6@bandit:~$ find / -type f -user bandit7 -group bandit6 -size 33c
-find: ‘/root’: Permission denied
-...
-find: ‘/var/lib/polkit-1’: Permission denied
+bandit6@bandit:~$ find / -type f -user bandit7 -group bandit6 -size 33c 2> /dev/null
 /var/lib/dpkg/info/bandit7.password
-find: ‘/var/log’: Permission denied
-...
 bandit6@bandit:~$ cat /var/lib/dpkg/info/bandit7.password
 HKBPTKQnIay4Fw76bEy8PVxKEDQRKTzs
+
 #+END_SRC
+
+** Level 7
+The password is in the file 'data.txt' next to the word millionth. Grep can be
+used to find the line that contains that word.
+
+#+BEGIN_SRC 
+
+bandit7@bandit:~$ ls -Al
+total 4100
+-rw-r--r-- 1 root    root        220 May 15  2017 .bash_logout
+-rw-r--r-- 1 root    root       3526 May 15  2017 .bashrc
+-rw-r----- 1 bandit8 bandit7 4184396 May  7  2020 data.txt
+-rw-r--r-- 1 root    root        675 May 15  2017 .profile
+bandit7@bandit:~$ grep millionth data.txt
+millionth	cvX2JJa4CFALtqS87jk27qwqGhBM9plV
+
+#+END_SRC
+
+** Level 8
+The password is in the file 'data.txt' and is the line that only occurs once in
+the file. Uniq -u can filter out all duplicate lines that are adjacent. To find
+the only unique line in the text the input must first be sorted with sort.
+
+#+BEGIN_SRC 
+
+bandit8@bandit:~$ ls -Al
+total 48
+-rw-r--r-- 1 root    root      220 May 15  2017 .bash_logout
+-rw-r--r-- 1 root    root     3526 May 15  2017 .bashrc
+-rw-r----- 1 bandit9 bandit8 33033 May  7  2020 data.txt
+-rw-r--r-- 1 root    root      675 May 15  2017 .profile
+bandit8@bandit:~$ sort data.txt | uniq -u
+UsvVyFSfZZWbi6wgC7dAFyFuR6jQQUhR
+
+#+END_SRC
+
+** Level 9
+The password for the next level is stored in the file data.txt in one of the 
+few human-readable strings, preceded by several ‘=’ characters.
+Strings can be used to print all the human readable characters and grep to
+find all the lines that contain one or more '='.
+
+#+BEGIN_SRC 
+
+bandit9@bandit:~$ ls -Al
+total 32
+-rw-r--r-- 1 root     root      220 May 15  2017 .bash_logout
+-rw-r--r-- 1 root     root     3526 May 15  2017 .bashrc
+-rw-r----- 1 bandit10 bandit9 19379 May  7  2020 data.txt
+-rw-r--r-- 1 root     root      675 May 15  2017 .profile
+bandit9@bandit:~$ strings data.txt | grep =
+========== the*2i"4
+=:G e
+========== password
+<I=zsGi
+Z)========== is
+A=|t&E
+Zdb=
+c^ LAh=3G
+*SF=s
+&========== truKLdjsbJ5g7yyJ2X2R0o3a5HQJFuLk
+S=A.H&^
+
+#+END_SRC
+
+** Level 10
+The password for the next level is stored in the file data.txt, which contains 
+base64 encoded data.
+To decode base64 use the command base64 with the flag -d.
+
+#+BEGIN_SRC 
+
+bandit10@bandit:~$ ls -Al
+total 16
+-rw-r--r-- 1 root     root      220 May 15  2017 .bash_logout
+-rw-r--r-- 1 root     root     3526 May 15  2017 .bashrc
+-rw-r----- 1 bandit11 bandit10   69 May  7  2020 data.txt
+-rw-r--r-- 1 root     root      675 May 15  2017 .profile
+bandit10@bandit:~$ base64 -d data.txt
+The password is IFukwKGsFW8MOq3IRFqrxE1hxTNEbUPR
+
+#+END_SRC
+
+** Level 11
+The password for the next level is stored in the file data.txt, where all 
+lowercase (a-z) and uppercase (A-Z) letters have been rotated by 13 positions.
+Tr can be used to translate a set of characters to another set of characters 
+and therefore perform a ROT13 algorithm.
+
+#+BEGIN_SRC 
+
+bandit11@bandit:~$ ls -Al
+total 16
+-rw-r--r-- 1 root     root      220 May 15  2017 .bash_logout
+-rw-r--r-- 1 root     root     3526 May 15  2017 .bashrc
+-rw-r----- 1 bandit12 bandit11   49 May  7  2020 data.txt
+-rw-r--r-- 1 root     root      675 May 15  2017 .profile
+bandit11@bandit:~$ cat data.txt | tr [a-zA-Z] [n-za-mN-ZA-M]
+The password is 5Te8Y4drgCRfCx8ugdwuEX8KFC6k2EUu
+
+#+END_SRC
+
+** Level 12
+The password for the next level is stored in the file data.txt, which is a 
+hexdump of a file that has been repeatedly compressed.
+To get the password first reverse the hex dump with xxd and then decompress
+the file as many times as necessary with the correct tool. To find out which
+tool to use, use the file command.
+
+ #+BEGIN_SRC 
+ 
+bandit12@bandit:~$ mkdir /tmp/bandit12dir
+bandit12@bandit:~$ cd !$
+cd /tmp/bandit12dir
+bandit12@bandit:/tmp/bandit12dir$ cp ~/data.txt .
+
+bandit12@bandit:/tmp/bandit12dir$ xxd -r data.txt > out
+
+bandit12@bandit:/tmp/bandit12dir$ file out
+out: gzip compressed data, was "data2.bin", last modified: Thu May  7 18:14:30 2020, max compression, from Unix
+bandit12@bandit:/tmp/bandit12dir$ mv out out.gz
+bandit12@bandit:/tmp/bandit12dir$ gzip -d out.gz
+bandit12@bandit:/tmp/bandit12dir$ ls
+data.txt  out
+
+bandit12@bandit:/tmp/bandit12dir$ file out
+out: bzip2 compressed data, block size = 900k
+bandit12@bandit:/tmp/bandit12dir$ mv out out.bz2
+bandit12@bandit:/tmp/bandit12dir$ bzip2 -d out.bz2
+bandit12@bandit:/tmp/bandit12dir$ ls
+data.txt  out
+
+bandit12@bandit:/tmp/bandit12dir$ file out
+out: gzip compressed data, was "data4.bin", last modified: Thu May  7 18:14:30 2020, max compression, from Unix
+bandit12@bandit:/tmp/bandit12dir$ mv out out.gz
+bandit12@bandit:/tmp/bandit12dir$ gzip -d out.gz
+bandit12@bandit:/tmp/bandit12dir$ ls
+data.txt  out
+bandit12@bandit:/tmp/bandit12dir$ file out
+out: POSIX tar archive (GNU)
+
+bandit12@bandit:/tmp/bandit12dir$ tar -xf out
+bandit12@bandit:/tmp/bandit12dir$ ls
+data5.bin  data.txt  out
+bandit12@bandit:/tmp/bandit12dir$ file data5.bin
+data5.bin: POSIX tar archive (GNU)
+bandit12@bandit:/tmp/bandit12dir$ tar -xf data5.bin
+bandit12@bandit:/tmp/bandit12dir$ ls
+data5.bin  data6.bin  data.txt  out
+
+bandit12@bandit:/tmp/bandit12dir$ file data6.bin
+data6.bin: bzip2 compressed data, block size = 900k
+bandit12@bandit:/tmp/bandit12dir$ mv data6.bin data.bz2
+bandit12@bandit:/tmp/bandit12dir$ bzip2 -d data.bz2
+bandit12@bandit:/tmp/bandit12dir$ ls
+data  data5.bin  data.txt  out
+
+bandit12@bandit:/tmp/bandit12dir$ file data
+data: POSIX tar archive (GNU)
+bandit12@bandit:/tmp/bandit12dir$ tar -xf data
+bandit12@bandit:/tmp/bandit12dir$ ls
+data  data5.bin  data8.bin  data.txt  out
+
+bandit12@bandit:/tmp/bandit12dir$ file data8.bin
+data8.bin: gzip compressed data, was "data9.bin", last modified: Thu May  7 18:14:30 2020, max compression, from Unix
+bandit12@bandit:/tmp/bandit12dir$ mv data8.bin data.gz
+bandit12@bandit:/tmp/bandit12dir$ gzip -d data.gz
+gzip: data already exists; do you wish to overwrite (y or n)? y
+bandit12@bandit:/tmp/bandit12dir$ ls
+data  data5.bin  data.txt  out
+
+bandit12@bandit:/tmp/bandit12dir$ file data
+data: ASCII text
+bandit12@bandit:/tmp/bandit12dir$ cat data
+The password is 8ZjyCRiBWFYkneahHwxCv3wb2a1ORpYL
+ #+END_SRC
+
+** Level 13
+The password for the next level is stored in /etc/bandit_pass/bandit14 and can 
+only be read by user bandit14. For this level, you don’t get the next password, 
+but you get a private SSH key that can be used to log into the next level.
+To become the bandit14 user use the sshkey.private in the ssh command and 
+connect to the localhost as bandit14. Then cat out the password.
+
+#+BEGIN_SRC 
+
+bandit13@bandit:~$ ls
+sshkey.private
+bandit13@bandit:~$ ssh -i sshkey.private bandit14@localhost
+Could not create directory '/home/bandit13/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit13/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit14@bandit:~$ cat /etc/bandit_pass/bandit14
+4wcYUJFw0k0XLShlDzztnTBHiqxU3b3e
+#+END_SRC
+
+** Level 14
+The password for the next level can be retrieved by submitting the password of 
+the current level to port 30000 on localhost.
+Use netcat to connect to the localhost on port 30000 and enter the password of
+level 14.
+
+#+BEGIN_SRC 
+
+bandit14@bandit:~$ nc localhost 30000
+4wcYUJFw0k0XLShlDzztnTBHiqxU3b3e
+Correct!
+BfMYroe26WYalil77FoDi9qh59eK5xNr
+
+#+END_SRC
+
+** Level 15
+
