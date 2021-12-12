@@ -397,8 +397,8 @@ bandit14@bandit:~$ cat /etc/bandit_pass/bandit14
 ** Level 14
 The password for the next level can be retrieved by submitting the password of 
 the current level to port 30000 on localhost.
-Use netcat to connect to the localhost on port 30000 and enter the password of
-level 14.
+Use netcat or telnet to connect to the localhost on port 30000 and enter the 
+password of level 14.
 
 #+BEGIN_SRC 
 
@@ -410,4 +410,128 @@ BfMYroe26WYalil77FoDi9qh59eK5xNr
 #+END_SRC
 
 ** Level 15
+The password for the next level can be retrieved by submitting the password of 
+the current level to port 30001 on localhost using SSL encryption.
+Use openssl with s_client to connect to the localhost at port 30001.
 
+#+BEGIN_SRC 
+
+bandit15@bandit:~$ openssl s_client -connect localhost:30001
+CONNECTED(00000003)
+...
+BfMYroe26WYalil77FoDi9qh59eK5xNr
+Correct!
+cluFn7wTiGryunymYOu4RcffSxQluehd
+
+closed
+#+END_SRC
+
+** Level 16
+The credentials for the next level can be retrieved by submitting the password 
+of the current level to a port on localhost in the range 31000 to 32000. First 
+find out which of these ports have a server listening on them. Then find out 
+which of those speak SSL and which don’t. There is only 1 server that will give 
+the next credentials, the others will simply send back to you whatever you send 
+to it.
+Use nmap to scan all the port in the range 31000-32000 and use the flag -sV to
+check if the port uses SSL. The password for the next level is a RSA key. Store
+it in a file with permissions 0400 so it can only be read by the user. And use 
+SSH and the private key to login to the server for the next level just like in 
+level 13.
+
+#+BEGIN_SRC 
+
+bandit16@bandit:~$ nmap localhost -p 31000-32000 -sV
+
+Starting Nmap 7.40 ( https://nmap.org ) at 2021-12-10 20:03 CET
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.00031s latency).
+Not shown: 996 closed ports
+PORT      STATE SERVICE     VERSION
+31046/tcp open  echo
+31518/tcp open  ssl/echo
+31691/tcp open  echo
+31790/tcp open  ssl/unknown
+31960/tcp open  echo
+
+bandit16@bandit:~$ openssl s_client -connect localhost:31790
+---
+cluFn7wTiGryunymYOu4RcffSxQluehd
+Correct!
+-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAvmOkuifmMg6HL2YPIOjon6iWfbp7c3jx34YkYWqUH57SUdyJ
+imZzeyGC0gtZPGujUSxiJSWI/oTqexh+cAMTSMlOJf7+BrJObArnxd9Y7YT2bRPQ
+Ja6Lzb558YW3FZl87ORiO+rW4LCDCNd2lUvLE/GL2GWyuKN0K5iCd5TbtJzEkQTu
+DSt2mcNn4rhAL+JFr56o4T6z8WWAW18BR6yGrMq7Q/kALHYW3OekePQAzL0VUYbW
+JGTi65CxbCnzc/w4+mqQyvmzpWtMAzJTzAzQxNbkR2MBGySxDLrjg0LWN6sK7wNX
+x0YVztz/zbIkPjfkU1jHS+9EbVNj+D1XFOJuaQIDAQABAoIBABagpxpM1aoLWfvD
+KHcj10nqcoBc4oE11aFYQwik7xfW+24pRNuDE6SFthOar69jp5RlLwD1NhPx3iBl
+J9nOM8OJ0VToum43UOS8YxF8WwhXriYGnc1sskbwpXOUDc9uX4+UESzH22P29ovd
+d8WErY0gPxun8pbJLmxkAtWNhpMvfe0050vk9TL5wqbu9AlbssgTcCXkMQnPw9nC
+YNN6DDP2lbcBrvgT9YCNL6C+ZKufD52yOQ9qOkwFTEQpjtF4uNtJom+asvlpmS8A
+vLY9r60wYSvmZhNqBUrj7lyCtXMIu1kkd4w7F77k+DjHoAXyxcUp1DGL51sOmama
++TOWWgECgYEA8JtPxP0GRJ+IQkX262jM3dEIkza8ky5moIwUqYdsx0NxHgRRhORT
+8c8hAuRBb2G82so8vUHk/fur85OEfc9TncnCY2crpoqsghifKLxrLgtT+qDpfZnx
+SatLdt8GfQ85yA7hnWWJ2MxF3NaeSDm75Lsm+tBbAiyc9P2jGRNtMSkCgYEAypHd
+HCctNi/FwjulhttFx/rHYKhLidZDFYeiE/v45bN4yFm8x7R/b0iE7KaszX+Exdvt
+SghaTdcG0Knyw1bpJVyusavPzpaJMjdJ6tcFhVAbAjm7enCIvGCSx+X3l5SiWg0A
+R57hJglezIiVjv3aGwHwvlZvtszK6zV6oXFAu0ECgYAbjo46T4hyP5tJi93V5HDi
+Ttiek7xRVxUl+iU7rWkGAXFpMLFteQEsRr7PJ/lemmEY5eTDAFMLy9FL2m9oQWCg
+R8VdwSk8r9FGLS+9aKcV5PI/WEKlwgXinB3OhYimtiG2Cg5JCqIZFHxD6MjEGOiu
+L8ktHMPvodBwNsSBULpG0QKBgBAplTfC1HOnWiMGOU3KPwYWt0O6CdTkmJOmL8Ni
+blh9elyZ9FsGxsgtRBXRsqXuz7wtsQAgLHxbdLq/ZJQ7YfzOKU4ZxEnabvXnvWkU
+YOdjHdSOoKvDQNWu6ucyLRAWFuISeXw9a/9p7ftpxm0TSgyvmfLF2MIAEwyzRqaM
+77pBAoGAMmjmIJdjp+Ez8duyn3ieo36yrttF5NSsJLAbxFpdlc1gvtGCWW+9Cq0b
+dxviW8+TFVEBl1O4f7HVm6EpTscdDxU+bCXWkfjuRb7Dy9GOtt9JPsX8MBTakzh3
+vBgsyi/sN3RqRBcGU40fOoZyfAMT8s1m/uYv52O6IgeuZ/ujbjY=
+-----END RSA PRIVATE KEY-----
+
+closed
+
+#+END_SRC
+
+** Level 17
+There are 2 files in the homedirectory: passwords.old and passwords.new. The 
+password for the next level is in passwords.new and is the only line that has 
+been changed between passwords.old and passwords.new
+Using the diff command without flags will give the changed line.
+
+#+BEGIN_SRC 
+
+bandit17@bandit:~$ ls -Al
+total 28
+-rw-r----- 1 bandit17 bandit17   33 Jul 11  2020 .bandit16.password
+-rw-r--r-- 1 root     root      220 May 15  2017 .bash_logout
+-rw-r--r-- 1 root     root     3526 May 15  2017 .bashrc
+-rw-r----- 1 bandit18 bandit17 3300 May  7  2020 passwords.new
+-rw-r----- 1 bandit18 bandit17 3300 May  7  2020 passwords.old
+-rw-r--r-- 1 root     root      675 May 15  2017 .profile
+drwxr-xr-x 2 root     root     4096 Jul 11  2020 .ssh
+bandit17@bandit:~$ diff passwords.new passwords.old
+42c42
+< kfBf3eYk5BPBRzwjqutbbfE887SVc5Yd
+---
+> w0Yfolrc5bwjS4qw5mq1nnQi6mF03bii
+#+END_SRC
+
+Meaning kfBf3eYk5BPBRzwjqutbbfE887SVc5Yd is the password for level 18.
+
+** Level 18
+The password for the next level is stored in a file readme in the homedirectory. 
+Unfortunately, someone has modified .bashrc to log you out when you log in with 
+SSH.
+To execute a command immediately after connecting to the remote server give the
+ssh command the flag -o (stands for option, and allows for adding utility that
+is not covered by the flags, such as executing a command remotely), followed by 
+RemoteCommand="some command" where some commmand is the desired command.
+
+#+BEGIN_SRC 
+
+bryan@xps:~/overthewire$ sshpass -p `cat bandit18.txt` ssh bandit18@bandit.labs.overthewire.org -p 2220 -o RemoteCommand="cat readme"
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+IueksS7Ubh8G3DCwVzrTd8rAVOwq3M5x
+
+#+END_SRC
+
+** Level 19
