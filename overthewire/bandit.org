@@ -853,6 +853,12 @@ The password to the next level is: 0ef186ac70e04ea33b4c1853d2526fa2
 There is a git repository at ssh://bandit28-git@localhost/home/bandit28-git/repo. The password for the user bandit28-git is the same as for the user bandit28.
 Clone the repository and find the password for the next level.
 
+First create a new directory in '/tmp', and then clone the given repository. The
+git repo again contains a README but the password is, 'xx...x', hidden. 
+'git show' returns the previous versions of the README file and what was 
+changed in between commits. Analyzing the output gives the password for 
+bandit29: bbc96594b4e001778eee9975372716b2
+
 #+BEGIN_SRC 
 
 bandit28@bandit:/tmp/newdir$ mkdir /tmp/newdirr
@@ -885,5 +891,245 @@ Some notes for level29 of bandit.
 
 - username: bandit29
 - password: xxxxxxxxxx
+bandit28@bandit:/tmp/newdrr$ cd repo/
+bandit28@bandit:/tmp/newdrr/repo$ git show
+commit edd935d60906b33f0619605abd1689808ccdd5ee
+Author: Morla Porla <morla@overthewire.org>
+Date:   Thu May 7 20:14:49 2020 +0200
+
+    fix info leak
+
+diff --git a/README.md b/README.md
+index 3f7cee8..5c6457b 100644
+--- a/README.md
++++ b/README.md
+@@ -4,5 +4,5 @@ Some notes for level29 of bandit.
+ ## credentials
+
+ - username: bandit29
+-- password: bbc96594b4e001778eee9975372716b2
++- password: xxxxxxxxxx
+
+#+END_SRC
+
+** Level 29
+There is a git repository at ssh://bandit29-git@localhost/home/bandit29-git/repo. The password for the user bandit29-git is the same as for the user bandit29.
+Clone the repository and find the password for the next level.
+
+Again clone the given repo in a directory in '/tmp/' and 'cat' out the contents
+of the README. The <no password in production!> hints at there being multiple
+branches, to list them all 'git branch -a'. Change to the 'dev' branch with 
+'git checkout dev'. This branch also has a README which contains the password
+for bandit30: 5b90576bedb2cc04c86a9e924ce42faf.
+
+#+BEGIN_SRC 
+
+bandit29@bandit:~$ mkdir /tmp/newdrr
+bandit29@bandit:~$ cd !$
+cd /tmp/newdrr
+bandit29@bandit:/tmp/newdrr$ git clone ssh://bandit29-git@localhost/home/bandit29-git/repo
+Cloning into 'repo'...
+Could not create directory '/home/bandit29/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit29/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit29-git@localhost's password:
+remote: Counting objects: 16, done.
+remote: Compressing objects: 100% (11/11), done.
+remote: Total 16 (delta 2), reused 0 (delta 0)
+Receiving objects: 100% (16/16), done.
+Resolving deltas: 100% (2/2), done.
+bandit29@bandit:/tmp/newdrr$ cd repo/
+bandit29@bandit:/tmp/newdrr/repo$ ls
+README.md
+bandit29@bandit:/tmp/newdrr/repo$ cat README.md
+# Bandit Notes
+Some notes for bandit30 of bandit.
+
+## credentials
+
+- username: bandit30
+- password: <no passwords in production!>
+
+bandit29@bandit:/tmp/newdrr/repo$ git branch -a
+- master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/dev
+  remotes/origin/master
+  remotes/origin/sploits-dev
+bandit29@bandit:/tmp/newdrr/repo$ git checkout dev
+Branch dev set up to track remote branch dev from origin.
+Switched to a new branch 'dev'
+bandit29@bandit:/tmp/newdrr/repo$ ls
+code  README.md
+bandit29@bandit:/tmp/newdrr/repo$ cat README.md
+# Bandit Notes
+Some notes for bandit30 of bandit.
+
+## credentials
+
+- username: bandit30
+- password: 5b90576bedb2cc04c86a9e924ce42faf
+
+#+END_SRC
+
+** Level 30
+There is a git repository at ssh://bandit30-git@localhost/home/bandit30-git/repo. 
+The password for the user bandit30-git is the same as for the user bandit30.
+Clone the repository and find the password for the next level.
+
+Just as the previous exercises clone the repo and 'cat README', which has no 
+useful contents. So lets explorer the '.git' directory  which contains a file 
+named 'packed-refs'. This file contains hashes of tags and heads, most notably 
+in this case a hash of 'refs/tags/secret'. Doing a 'git show' for this has 
+results in the password for bandit31: 47e603bb428404d265f59c42920d81e5.
+
+#+BEGIN_SRC 
+
+bandit30@bandit:~$ mkdir /tmp/newdrr
+bandit30@bandit:~$ cd !$
+cd /tmp/newdrr
+bandit30@bandit:/tmp/newdrr$ git clone ssh://bandit30-git@localhost/home/bandit30-git/repo
+Cloning into 'repo'...
+Could not create directory '/home/bandit30/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit30/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit30-git@localhost's password:
+remote: Counting objects: 4, done.
+Receiving objects: 100% (4/4), 297 bytes | 0 bytes/s, done.
+remote: Total 4 (delta 0), reused 0 (delta 0)
+bandit30@bandit:/tmp/newdrr$ ls repo/
+README.md
+bandit30@bandit:/tmp/newdrr$ cat repo/README.md
+just an epmty file... muahaha
+bandit30@bandit:/tmp/newdrr$ cd repo/
+bandit30@bandit:/tmp/newdrr/repo$ ls -Al .git/
+total 44
+drwxr-sr-x 2 bandit30 root 4096 Mar  2 09:35 branches
+-rw-r--r-- 1 bandit30 root  276 Mar  2 09:35 config
+-rw-r--r-- 1 bandit30 root   73 Mar  2 09:35 description
+-rw-r--r-- 1 bandit30 root   23 Mar  2 09:35 HEAD
+drwxr-sr-x 2 bandit30 root 4096 Mar  2 09:35 hooks
+-rw-r--r-- 1 bandit30 root  137 Mar  2 09:35 index
+drwxr-sr-x 2 bandit30 root 4096 Mar  2 09:35 info
+drwxr-sr-x 3 bandit30 root 4096 Mar  2 09:35 logs
+drwxr-sr-x 4 bandit30 root 4096 Mar  2 09:35 objects
+-rw-r--r-- 1 bandit30 root  165 Mar  2 09:35 packed-refs
+drwxr-sr-x 5 bandit30 root 4096 Mar  2 09:35 refs
+bandit30@bandit:/tmp/newdrr/repo$ cat .git/packed-refs
+# pack-refs with: peeled fully-peeled
+3aefa229469b7ba1cc08203e5d8fa299354c496b refs/remotes/origin/master
+f17132340e8ee6c159e0a4a6bc6f80e1da3b1aea refs/tags/secret
+bandit30@bandit:/tmp/newdrr/repo$ git show f17132340e8ee6c159e0a4a6bc6f80e1da3b1aea
+47e603bb428404d265f59c42920d81e5
+
+#+END_SRC
+
+** Level 31
+There is a git repository at ssh://bandit31-git@localhost/home/bandit31-git/repo. The password for the user bandit31-git is the same as for the user bandit31.
+Clone the repository and find the password for the next level.
+
+After clone the repo and looking at the contents of the 'README' is clear that 
+the file 'key.txt' must be push to the remote repository. So create the 
+'key.txt' file with the contents 'May I come in?'. Then to push it to the 
+remote repo you need three commands: 'git add -f [filename]' (the 'f' flag is 
+necessary because the '.gitignore' is set to ignore all '.txt' files), 
+'git commit -m [message]' and 'git push'. After the push the output will show 
+the password for bandit32: 56a9bf19c63d650ce78e6ec0354ee45e
+
+#+BEGIN_SRC 
+
+bandit31@bandit:~$ mkdir /tmp/newdrr
+bandit31@bandit:~$ cd !$
+cd /tmp/newdrr
+bandit31@bandit:/tmp/newdrr$ git clone ssh://bandit31-git@localhost/home/bandit31-git/repo
+Cloning into 'repo'...
+Could not create directory '/home/bandit31/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit31/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit31-git@localhost's password:
+remote: Counting objects: 4, done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 4 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (4/4), done.
+bandit31@bandit:/tmp/newdrr$ cd repo/
+bandit31@bandit:/tmp/newdrr/repo$ cat README.md
+This time your task is to push a file to the remote repository.
+
+Details:
+    File name: key.txt
+    Content: 'May I come in?'
+    Branch: master
+
+bandit31@bandit:/tmp/newdrr/repo$ ls -Al
+total 12
+drwxr-sr-x 8 bandit31 root 4096 Mar  2 09:58 .git
+-rw-r--r-- 1 bandit31 root    6 Mar  2 09:58 .gitignore
+-rw-r--r-- 1 bandit31 root  147 Mar  2 09:58 README.md
+bandit31@bandit:/tmp/newdrr/repo$ echo 'May I come in?' > key.txt
+bandit31@bandit:/tmp/newdrr/repo$ ls
+key.txt  README.md
+bandit31@bandit:/tmp/newdrr/repo$ git add key.txt
+The following paths are ignored by one of your .gitignore files:
+key.txt
+Use -f if you really want to add them.
+bandit31@bandit:/tmp/newdrr/repo$ git add -f key.txt
+bandit31@bandit:/tmp/newdrr/repo$ git commit -m 'add key.txt'
+[master fd1861c] add key.txt
+ 1 file changed, 1 insertion(+)
+ create mode 100644 key.txt
+bandit31@bandit:/tmp/newdrr/repo$ git push
+Could not create directory '/home/bandit31/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:98UL0ZWr85496EtCRkKlo20X3OPnyPSB5tB5RPbhczc.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/bandit31/.ssh/known_hosts).
+This is a OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+bandit31-git@localhost's password:
+Counting objects: 3, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 321 bytes | 0 bytes/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+remote: ### Attempting to validate files... ####
+remote:
+remote: .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
+remote:
+remote: Well done! Here is the password for the next level:
+remote: 56a9bf19c63d650ce78e6ec0354ee45e
+remote:
+remote: .oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.oOo.
+remote:
+To ssh://localhost/home/bandit31-git/repo
+ ! [remote rejected] master -> master (pre-receive hook declined)
+error: failed to push some refs to 'ssh://bandit31-git@localhost/home/bandit31-git/repo'
+
+#+END_SRC
+
+** Level 32
+After all this git stuff its time for another escape. Good luck!
+
+The trick to escape the uppercase shell is to use the environment variable $0 
+which returns the file name of the command that executed the process in this 
+case '/bin/bash'. From here simply 'cat' out the password of bandit33.
+
+#+BEGIN_SRC 
+
+WELCOME TO THE UPPERCASE SHELL
+>> $0
+$ cat /etc/bandit_pass/bandit33
+c9c3199ddf4121b10cf581a98d51caee
 
 #+END_SRC
